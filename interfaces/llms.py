@@ -195,7 +195,7 @@ class Llama(LLM):
         message += user_prompt + "\n"
 
         api_url = self.API_URL + self.model_name
-        headers = {"Authorization": f"Bearer {os.environ["HF_TOKEN"]}"}
+        headers = {"Authorization": f"Bearer {os.environ['HF_TOKEN']}"}
         inputs = {"inputs": "message"}
         response = requests.post(api_url, headers=headers, json=inputs)
         result = response.json()
