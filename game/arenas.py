@@ -80,7 +80,7 @@ class Arena:
         """
         names = ["Alex", "Blake", "Charlie", "Drew"]
         model_names = [
-            "gpt-3.5-turbo",
+            "Meta-Llama-3-8B", # "gpt-3.5-turbo",
             "claude-3-haiku-20240307",
             "gemini-pro",
             "gpt-4o-mini",
