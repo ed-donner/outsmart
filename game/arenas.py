@@ -80,11 +80,11 @@ class Arena:
         """
         names = ["Alex", "Blake", "Charlie", "Drew"]
         model_names = [
-            "Meta-Llama-3-8B", # "gpt-3.5-turbo",
+            "gpt-3.5-turbo",
             "claude-3-haiku-20240307",
             "gemini-pro",
             "gpt-4o-mini",
-        ]  # claude-3-5-sonnet-20240620
+        ]
         temperatures = [0.7, 0.7, 0.7, 0.7]
         players = []
         for data in zip(names, model_names, temperatures):
