@@ -4,6 +4,7 @@ import logging
 from game.players import Player
 from models.moves import Move
 from models.records import TurnRecord
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -43,20 +44,30 @@ class Referee:
             logger.error(f"Response received was:\n{response}")
             return TurnRecord(player.name, self.turn, is_invalid_move=True)
 
+    def player_with_name(self, name: str) -> Player:
+        for player in self.players:
+            if player.name == name:
+                return player
+        raise ValueError(f"Failed to find player with name {name}")
+
     def do_turn(self, progress):
         """
         This is the entry point, called by an Arena object to run a Turn
-        First get each Player to make a move
+        First get each Player to make a move using concurrent.futures to run in parallel
         Then evaluate each Player in turn
         :param progress: an object on which to report progress that will be reflected in the UI
         :return:
         """
-        for index, player in enumerate(self.players):
-            prog = index / len(self.players)
-            progress.progress(prog, text=f"{player.name} is thinking...")
-            record = self.do_turn_for_player(player)
-            self.records[player.name] = record
-            player.records.append(record)
+        progress.progress(0, "Players are thinking..")
+        responded = []
+        with ThreadPoolExecutor(max_workers=4) as e:
+            for record in e.map(self.do_turn_for_player, self.players):
+                player = self.player_with_name(record.name)
+                responded.append(record.name)
+                prog = len(responded) / len(self.players)
+                progress.progress(prog, f"{', '.join(responded)} responded..")
+                self.records[record.name] = record
+                player.records.append(record)
         progress.progress(1.0, text="Finishing up..")
         self.handle_turn()
 
