@@ -15,7 +15,7 @@ class Arena:
 
     def __init__(self, players: List[Player]):
         """
-        Create a new instance of the receiver
+        Create a new instance of the Arena, the manager of the game
         Set the 'other players' field for each player. Shuffle it to reduce any bias on the order in which players
         are listed.
         :param players: the players to use

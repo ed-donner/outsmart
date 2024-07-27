@@ -65,7 +65,7 @@ class Referee:
                 player = self.player_with_name(record.name)
                 responded.append(record.name)
                 prog = len(responded) / len(self.players)
-                progress.progress(prog, f"{', '.join(responded)} responded..")
+                progress.progress(prog, f"\n{', '.join(responded)} responded..")
                 self.records[record.name] = record
                 player.records.append(record)
         progress.progress(1.0, text="Finishing up..")
