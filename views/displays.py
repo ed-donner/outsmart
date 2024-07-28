@@ -3,6 +3,7 @@ from game.arenas import Arena
 import streamlit as st
 import base64
 from io import BytesIO
+from views.headers import display_headers
 
 
 class Display:
@@ -57,31 +58,7 @@ class Display:
         bar.empty()
 
     def display_page(self):
-        header_columns = st.columns(3)
-        with header_columns[0]:
-            st.title("Outsmart")
-            st.write("A battle of diplomacy and deviousness between LLMs")
-            st.button(
-                f"Run Turn {self.arena.turn}",
-                disabled=self.arena.is_game_over,
-                on_click=self.do_turn,
-            )
-        with header_columns[1]:
-            with open("outsmart_arena.txt", "r") as f:
-                base64_string = f.read()
-            image_data = base64.b64decode(base64_string)
-            st.image(BytesIO(image_data), width=400)
-        with header_columns[2]:
-            st.write(
-                """##### Each turn:
-- Players take 1 coin & give 1 coin to another
-- Players send private messages to negotiate
-- Players can form alliances to get extra coins"""
-            )
-            st.write(
-                """Read about the [game](https://edwarddonner.com)  
-Clone the [repo](https://github.com/ed-donner/outsmart) to use the latest frontier models"""
-            )
+        display_headers(self.arena, self.do_turn)
         self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))
 
