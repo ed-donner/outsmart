@@ -55,13 +55,24 @@ class Display:
         bar.empty()
 
     def display_page(self):
-        st.title("Outsmart")
-        st.write("A battle of diplomacy and deviousness between LLMs")
-        st.button(
-            f"Run Turn {self.arena.turn}",
-            disabled=self.arena.is_game_over,
-            on_click=self.do_turn,
-        )
+        header_columns = st.columns(3)
+        with header_columns[0]:
+            st.title("Outsmart")
+            st.write("A battle of diplomacy and deviousness between LLMs")
+            st.button(
+                f"Run Turn {self.arena.turn}",
+                disabled=self.arena.is_game_over,
+                on_click=self.do_turn,
+            )
+        with header_columns[1]:
+            st.image("outsmart.jpg", width=400)
+        with header_columns[2]:
+            st.write("#### Each turn:")
+            st.write(
+                """- Players take 1 coin & give 1 coin to another player
+- Players send a private message to each player to negotiate
+- Players can form an alliance to take extra coins from a player"""
+            )
         self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))
 
