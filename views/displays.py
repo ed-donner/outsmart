@@ -1,6 +1,8 @@
 import logging
 from game.arenas import Arena
 import streamlit as st
+import base64
+from io import BytesIO
 
 
 class Display:
@@ -65,13 +67,20 @@ class Display:
                 on_click=self.do_turn,
             )
         with header_columns[1]:
-            st.image("outsmart.jpg", width=400)
+            with open("outsmart_arena.txt", "r") as f:
+                base64_string = f.read()
+            image_data = base64.b64decode(base64_string)
+            st.image(BytesIO(image_data), width=400)
         with header_columns[2]:
-            st.write("#### Each turn:")
             st.write(
-                """- Players take 1 coin & give 1 coin to another player
-- Players send a private message to each player to negotiate
-- Players can form an alliance to take extra coins from a player"""
+                """##### Each turn:
+- Players take 1 coin & give 1 coin to another
+- Players send private messages to negotiate
+- Players can form alliances to get extra coins"""
+            )
+            st.write(
+                """Read about the [game](https://edwarddonner.com)  
+Clone the [repo](https://github.com/ed-donner/outsmart) to use the latest frontier models"""
             )
         self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))

@@ -199,5 +199,4 @@ class Llama(LLM):
         inputs = {"inputs": "message"}
         response = requests.post(api_url, headers=headers, json=inputs)
         result = response.json()
-        print(result)
         return result
