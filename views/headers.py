@@ -18,7 +18,7 @@ def display_overview(arena, callback):
             use_container_width=True,
         )
     with button_columns[3]:
-        st.button("Run game", use_container_width=True)
+        st.button("Run Game", use_container_width=True)
 
 
 def display_image():
@@ -30,7 +30,7 @@ def display_image():
 
 def display_details():
     st.write(
-        """##### Each turn, the players:
+        """###### Each turn, players:
 - Take 1 coin & give 1 coin to another
 - Exchange private messages to negotiate
 - Try to form alliances to win extra coins"""
