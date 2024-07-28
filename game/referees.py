@@ -58,14 +58,14 @@ class Referee:
         :param progress: an object on which to report progress that will be reflected in the UI
         :return:
         """
-        progress.progress(0, "___\nPlayers are thinking..")
+        progress.progress(0, "Players are thinking..")
         responded = []
         with ThreadPoolExecutor(max_workers=4) as e:
             for record in e.map(self.do_turn_for_player, self.players):
                 player = self.player_with_name(record.name)
                 responded.append(record.name)
                 prog = len(responded) / len(self.players)
-                progress.progress(prog, f"___\n{', '.join(responded)} responded..")
+                progress.progress(prog, f"{', '.join(responded)} responded..")
                 self.records[record.name] = record
                 player.records.append(record)
         progress.progress(1.0, text="Finishing up..")

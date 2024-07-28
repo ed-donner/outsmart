@@ -9,6 +9,7 @@ class Display:
 
     def __init__(self, arena: Arena):
         self.arena = arena
+        self.progress_container = None
 
     def display_record(self, rec):
         if rec.is_invalid_move:
@@ -48,14 +49,20 @@ class Display:
     def do_turn(self):
         logging.info("Kicking off turn")
         progress_text = "Kicking off turn"
-        bar = st.progress(0.0, text=progress_text)
+        with self.progress_container.container():
+            bar = st.progress(0.0, text=progress_text)
         self.arena.do_turn(bar)
         bar.empty()
 
     def display_page(self):
         st.title("Outsmart")
         st.write("A battle of diplomacy and deviousness between LLMs")
-        st.button(f"Run Turn {self.arena.turn}", disabled=self.arena.is_game_over, on_click=self.do_turn)
+        st.button(
+            f"Run Turn {self.arena.turn}",
+            disabled=self.arena.is_game_over,
+            on_click=self.do_turn,
+        )
+        self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))
 
         for index, player_column in enumerate(player_columns):
