@@ -18,6 +18,7 @@ class Player:
     records: List[TurnRecord]
     is_dead: bool
     is_winner: bool
+    series: List[int]
 
     def __init__(self, name: str, model_name: str, temperature: float):
         """
@@ -31,6 +32,7 @@ class Player:
         self.history = {}
         self.coins = 12
         self.prior_coins = 12
+        self.series = [12]
         self.other_names = []  # this will be initialized during Arena construction
         self.records = []
         self.is_dead = False

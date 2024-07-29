@@ -2,6 +2,8 @@ from typing import List, Self
 from game.players import Player
 from game.referees import Referee
 import random
+import pandas as pd
+import math
 
 
 class Arena:
@@ -65,6 +67,8 @@ class Arena:
             player.prior_coins = player.coins
         ref = Referee(self.players, self.turn)
         ref.do_turn(progress)
+        for player in self.players:
+            player.series.append(player.coins)
         self.post_turn_solvency_check()
         if self.turn == 10:
             self.handle_game_over()
@@ -93,3 +97,11 @@ class Arena:
 
     def turn_name(self) -> str:
         return f"Turn {self.turn}"
+
+    def table(self) -> pd.DataFrame:
+        d = {}
+        padding = [math.nan] * (11 - self.turn)
+        for player in self.players:
+            series = player.series[:] + padding
+            d[player.name] = series[:11]
+        return pd.DataFrame(data=d, index=range(11))

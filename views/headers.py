@@ -3,10 +3,11 @@ import base64
 from io import BytesIO
 
 
-def display_overview(arena, callback):
+def display_overview(arena, do_turn, do_auto_turn):
     st.markdown("<h1 style='text-align: center;'>Outsmart</h1>", unsafe_allow_html=True)
     st.markdown(
-        "<p style='text-align: center;'>A battle of diplomacy and deviousness between LLMs</p>",
+        """<p style='text-align: center;'>A battle of diplomacy and deviousness between LLMs<br/>
+        <span style='text-align: center; font-size:13px;'>Read the <a href='https://edwarddonner.com'>backstory</a> or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span></p>""",
         unsafe_allow_html=True,
     )
     button_columns = st.columns([0.2, 1, 0.2, 1, 0.2])
@@ -14,11 +15,16 @@ def display_overview(arena, callback):
         st.button(
             f"Run Turn {arena.turn}",
             disabled=arena.is_game_over,
-            on_click=callback,
+            on_click=do_turn,
             use_container_width=True,
         )
     with button_columns[3]:
-        st.button("Run Game", use_container_width=True)
+        st.button(
+            "Run Game",
+            disabled=arena.is_game_over,
+            use_container_width=True,
+            on_click=do_auto_turn,
+        )
 
 
 def display_image():
@@ -28,24 +34,35 @@ def display_image():
     st.image(BytesIO(image_data), use_column_width="auto")
 
 
-def display_details():
-    st.write(
-        """###### Each turn, players:
+def display_details(header_container):
+    with header_container:
+        st.write("  \n")
+        st.write(
+            """###### Each turn, players:
 - Take 1 coin & give 1 coin to another
 - Exchange private messages to negotiate
 - Try to form alliances to win extra coins"""
-    )
-    st.write(
-        """Read about the [game](https://edwarddonner.com)  
-Clone the [repo](https://github.com/ed-donner/outsmart) to battle frontier models"""
-    )
+        )
 
 
-def display_headers(arena, callback):
+def display_chart(arena, header_container):
+    with header_container:
+        st.line_chart(
+            data=arena.table(),
+            height=300,
+            color=["#FFA500", "#FF4500", "#FFD700", "#8B4513"],
+        )
+
+
+def display_headers(arena, do_turn, do_auto_turn):
     header_columns = st.columns([1.5, 0.5, 2, 0.2, 1.8])
     with header_columns[0]:
         display_image()
     with header_columns[2]:
-        display_overview(arena, callback)
+        display_overview(arena, do_turn, do_auto_turn)
     with header_columns[4]:
-        display_details()
+        header_container = st.empty()
+        if arena.turn == 1:
+            display_details(header_container)
+        else:
+            display_chart(arena, header_container)

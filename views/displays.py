@@ -1,8 +1,6 @@
 import logging
 from game.arenas import Arena
 import streamlit as st
-import base64
-from io import BytesIO
 from views.headers import display_headers
 
 
@@ -16,17 +14,18 @@ class Display:
 
     def display_record(self, rec):
         if rec.is_invalid_move:
-            st.write("Illegal last move")
+            text = "Illegal last move"
         else:
-            st.write(f"Strategy: {rec.move.strategy}")
-            st.write(f"Gave to {rec.move.give}")
-            st.write(f"Took from {rec.move.take}")
+            text = f"Strategy: {rec.move.strategy}  \n\n"
+            text += f"- Gave to {rec.move.give}\n"
+            text += f"- Took from {rec.move.take}\n"
         if len(rec.alliances_with) > 0:
             alliances = ", ".join(rec.alliances_with)
-            st.write(f"In an alliance with {alliances}")
+            text += f"- :green[In an alliance with {alliances}]\n"
         if len(rec.alliances_against) > 0:
             alliances = ", ".join(rec.alliances_against)
-            st.write(f"Being ganged up on by {alliances}")
+            text += f"- :red[Being ganged up on by {alliances}]"
+        st.write(text)
 
     def display_player_title(self, each):
         if each.is_dead:
@@ -57,12 +56,24 @@ class Display:
         self.arena.do_turn(bar)
         bar.empty()
 
+    def do_auto_turn(self):
+        st.session_state.auto_move = False
+        self.do_turn()
+        if not self.arena.is_game_over:
+            st.session_state.auto_move = True
+
     def display_page(self):
-        display_headers(self.arena, self.do_turn)
+        display_headers(self.arena, self.do_turn, self.do_auto_turn)
         self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))
 
         for index, player_column in enumerate(player_columns):
             player = self.arena.players[index]
             with player_column:
-                self.display_player(player)
+                inner = st.empty()
+                with inner.container():
+                    self.display_player(player)
+
+        if st.session_state.auto_move:
+            self.do_auto_turn()
+            st.rerun()

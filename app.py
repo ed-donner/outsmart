@@ -28,6 +28,9 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 if "arena" not in st.session_state:
     st.session_state.arena = Arena.default()
+if "auto_move" not in st.session_state:
+    st.session_state.auto_move = False
+    st.session_state.do_move = False
 arena = st.session_state.arena
 
 Display(arena).display_page()
