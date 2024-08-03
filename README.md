@@ -1,8 +1,8 @@
 ---
 title: Outsmart
 emoji: 🧠
-colorFrom: orange
-colorTo: blue
+colorFrom: yellow
+colorTo: red
 python_version: 3.11
 sdk: streamlit
 sdk_version: 1.36.0
