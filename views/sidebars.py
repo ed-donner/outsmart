@@ -5,7 +5,14 @@ from game.arenas import Arena
 
 def display_ranks():
     st.write("Rank table")
-    column_config = {"LLM": st.column_config.TextColumn(width="small")}
+    st.write(
+        "This shows the skill level of each LLM competitor using the TrueSkill methodology, an ELO-style rating system for multi-player games."
+    )
+    column_config = {
+        "LLM": st.column_config.TextColumn(width="small"),
+        "Win %": st.column_config.NumberColumn(format="%.1f"),
+        "Skill": st.column_config.NumberColumn(format="%.1f"),
+    }
     st.dataframe(data=Arena.rankings(), hide_index=True, column_config=column_config)
 
 

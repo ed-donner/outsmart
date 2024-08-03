@@ -5,6 +5,8 @@ from typing import List, Self, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel
 import pandas as pd
+import trueskill
+from trueskill import Rating
 
 
 class Result(BaseModel):
@@ -16,6 +18,19 @@ class Result(BaseModel):
 
     def __repr__(self):
         return str(self.model_dump())
+
+    def update_on(self, df: pd.DataFrame):
+        llm = self.llm
+        if not (df["LLM"] == llm).any():
+            df.loc[len(df)] = [llm, 0, 0, 0]
+        games = df.loc[df["LLM"] == llm, "Games"].values[0]
+        wins_percent = df.loc[df["LLM"] == llm, "Win %"].values[0]
+        wins = games * wins_percent / 100
+        df.loc[df["LLM"] == llm, "Games"] += 1
+        if self.rank == 0:
+            df.loc[df["LLM"] == llm, "Win %"] = (wins + 1) * 100 / (games + 1)
+        else:
+            df.loc[df["LLM"] == llm, "Win %"] = wins * 100 / (games + 1)
 
 
 class Game(BaseModel):
@@ -52,13 +67,26 @@ class Game(BaseModel):
         return client.outsmart.games.count_documents()
 
     @classmethod
+    def ratings_for(cls, games: List[Self], df: pd.DataFrame) -> Dict[str, Rating]:
+        ratings = {row["LLM"]: Rating() for _, row in df.iterrows()}
+        for game in games:
+            llms = [result.llm for result in game.results]
+            rating_groups = [(ratings[llm],) for llm in llms]
+            ranks = [result.rank for result in game.results]
+            rated = trueskill.rate(rating_groups, ranks=ranks)
+            for index, llm in enumerate(llms):
+                ratings[llm] = rated[index][0]
+        return ratings
+
+    @classmethod
     def games_df(cls) -> pd.DataFrame:
         columns = ["LLM", "Games", "Win %", "Skill"]
         df = pd.DataFrame(columns=columns)
-        for game in cls.all():
+        games = cls.all()
+        for game in games:
             for result in game.results:
-                llm = result.llm
-                if not (df["LLM"] == llm).any():
-                    df.loc[len(df)] = [llm, 0, 0, 0]
-                df.loc[df["LLM"] == llm, "Games"] += 1
+                result.update_on(df)
+        ratings = cls.ratings_for(games, df)
+        for llm, rating in ratings.items():
+            df.loc[df["LLM"] == llm, "Skill"] = trueskill.expose(rating)
         return df

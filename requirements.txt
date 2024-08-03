@@ -11,3 +11,4 @@ watchdog
 pymongo
 numpy
 scipy
+trueskill

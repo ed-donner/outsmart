@@ -9,6 +9,7 @@ import math
 from scipy.stats import rankdata
 from models.games import Result, Game
 from datetime import datetime
+from trueskill import Rating
 
 
 class Arena:
@@ -138,5 +139,5 @@ class Arena:
     @staticmethod
     def rankings() -> pd.DataFrame:
         df = Game.games_df()
-        df_sorted = df.sort_values(by="Games", ascending=False)
-        return df_sorted
+        df = df.sort_values(by="Skill", ascending=False)
+        return df
