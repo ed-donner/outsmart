@@ -2,6 +2,7 @@ import logging
 from game.arenas import Arena
 import streamlit as st
 from views.headers import display_headers
+from views.sidebars import display_sidebar
 
 
 class Display:
@@ -63,6 +64,7 @@ class Display:
             st.session_state.auto_move = True
 
     def display_page(self):
+        display_sidebar()
         display_headers(self.arena, self.do_turn, self.do_auto_turn)
         self.progress_container = st.empty()
         player_columns = st.columns(len(self.arena.players))

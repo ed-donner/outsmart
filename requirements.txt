@@ -1,3 +1,4 @@
+pydantic
 python-dotenv
 black
 openai
@@ -7,3 +8,6 @@ streamlit
 pandas
 charset_normalizer
 watchdog
+pymongo
+numpy
+scipy

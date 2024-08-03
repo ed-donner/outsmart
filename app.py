@@ -2,6 +2,8 @@
 Entry point for the Outsmart Arena LLM Battle
 """
 
+import os
+
 from dotenv import load_dotenv
 import logging
 from game.arenas import Arena
@@ -23,11 +25,14 @@ st.set_page_config(
         "About": "Outsmart is an LLM arena in which 4 LLMs compete by negotiating with each other. Read more at https://edwarddonner.com"
     },
     page_icon="🧠",
+    initial_sidebar_state="collapsed",
 )
 st.markdown(STYLE, unsafe_allow_html=True)
 
+
 if "arena" not in st.session_state:
     st.session_state.arena = Arena.default()
+
 if "auto_move" not in st.session_state:
     st.session_state.auto_move = False
     st.session_state.do_move = False

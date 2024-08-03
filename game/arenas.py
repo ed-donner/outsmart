@@ -1,9 +1,14 @@
+import os
+import logging
 from typing import List, Self
 from game.players import Player
 from game.referees import Referee
 import random
 import pandas as pd
 import math
+from scipy.stats import rankdata
+from models.games import Result, Game
+from datetime import datetime
 
 
 class Arena:
@@ -39,6 +44,29 @@ class Arena:
             result += f"{player}\n"
         return result
 
+    def do_save_game(
+        self, names: List[str], llms: List[str], coins: List[int], ranks: List[int]
+    ):
+        results = []
+        for name, llm, coin, rank in zip(names, llms, coins, ranks):
+            r = Result(name=name, llm=llm, coins=coin, rank=rank)
+            results.append(r)
+        game = Game(run_date=datetime.now(), results=results)
+        game.save()
+
+    def save_game(self):
+        if os.getenv("MONGO_URI"):
+            try:
+                names = [player.name for player in self.players]
+                llms = [player.llm.model_name for player in self.players]
+                coins = [player.coins for player in self.players]
+                ranks = rankdata([-coin for coin in coins], method="min") - 1
+                ranks = list(ranks.astype(int))
+                self.do_save_game(names, llms, coins, ranks)
+            except Exception as e:
+                logging.error("Failed to save game results")
+                logging.error(e)
+
     def handle_game_over(self):
         """The game has ended - figure out who's a winner; there could be multiple"""
         self.is_game_over = True
@@ -46,6 +74,7 @@ class Arena:
         for player in self.players:
             if player.coins == winning_coins:
                 player.is_winner = True
+        self.save_game()
 
     def post_turn_solvency_check(self):
         """
@@ -105,3 +134,9 @@ class Arena:
             series = player.series[:] + padding
             d[player.name] = series[:11]
         return pd.DataFrame(data=d, index=range(11))
+
+    @staticmethod
+    def rankings() -> pd.DataFrame:
+        df = Game.games_df()
+        df_sorted = df.sort_values(by="Games", ascending=False)
+        return df_sorted
