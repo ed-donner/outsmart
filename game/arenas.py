@@ -9,7 +9,7 @@ import math
 from scipy.stats import rankdata
 from models.games import Result, Game
 from datetime import datetime
-from trueskill import Rating
+from interfaces.llms import LLM
 
 
 class Arena:
@@ -30,15 +30,15 @@ class Arena:
         """
         self.players = players
         for player in self.players:
-            others = [p.name for p in players if p.name != player.name]
+            others = [p for p in players if p.name != player.name]
             random.shuffle(others)
-            player.other_names = others
+            player.others = others
         self.turn = 1
         self.is_game_over = False
 
     def __repr__(self) -> str:
         """
-        :return: a string to represent the receiver
+        :return: a string to represent the arena
         """
         result = f"Arena at turn {self.turn} with {len(self.players)} players:\n"
         for player in self.players:
@@ -107,18 +107,26 @@ class Arena:
         return self.is_game_over
 
     @classmethod
+    def model_names(cls) -> List[str]:
+        arena_type = os.getenv("ARENA")
+        if arena_type == "random":
+            return random.sample(LLM.all_model_names(), 4)
+        else:
+            return [
+                "gpt-3.5-turbo",
+                "claude-3-haiku-20240307",
+                "gemini-1.0-pro",
+                "gpt-4o-mini",
+            ]
+
+    @classmethod
     def default(cls) -> Self:
         """
         Return a new instance of Arena with default players
         :return: an Arena instance
         """
         names = ["Alex", "Blake", "Charlie", "Drew"]
-        model_names = [
-            "gpt-3.5-turbo",
-            "claude-3-haiku-20240307",
-            "gemini-pro",
-            "gpt-4o-mini",
-        ]
+        model_names = cls.model_names()
         temperatures = [0.7, 0.7, 0.7, 0.7]
         players = []
         for data in zip(names, model_names, temperatures):
@@ -141,3 +149,7 @@ class Arena:
         df = Game.games_df()
         df = df.sort_values(by="Skill", ascending=False)
         return df
+
+    @staticmethod
+    def latest() -> pd.DataFrame:
+        return Game.latest_df()

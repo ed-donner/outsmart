@@ -52,8 +52,8 @@ class Game(BaseModel):
     def all(cls) -> List[Self]:
         client = cls.get_connection()
         games = client.outsmart.games
-        rows = list(games.find())
-        return [Game(**row) for row in rows]
+        docs = list(games.find())
+        return [Game(**doc) for doc in docs]
 
     def save(self):
         client = self.get_connection()
@@ -64,7 +64,21 @@ class Game(BaseModel):
     @st.cache_data(ttl=1)
     def count(cls) -> int:
         client = cls.get_connection()
-        return client.outsmart.games.count_documents()
+        return client.outsmart.games.count_documents({})
+
+    @classmethod
+    @st.cache_data(ttl=2)
+    def reset(cls):
+        client = cls.get_connection()
+        client.outsmart.games.delete_many({})
+
+    @classmethod
+    @st.cache_data(ttl=1)
+    def latest(cls, k: int) -> List[Self]:
+        client = cls.get_connection()
+        games = client.outsmart.games
+        latest = games.find().sort({"run_date": -1}).limit(k)
+        return [Game(**each) for each in latest]
 
     @classmethod
     def ratings_for(cls, games: List[Self], df: pd.DataFrame) -> Dict[str, Rating]:
@@ -89,4 +103,15 @@ class Game(BaseModel):
         ratings = cls.ratings_for(games, df)
         for llm, rating in ratings.items():
             df.loc[df["LLM"] == llm, "Skill"] = trueskill.expose(rating)
+        return df
+
+    @classmethod
+    def latest_df(cls) -> pd.DataFrame:
+        columns = ["When", "Winner(s)"]
+        df = pd.DataFrame(columns=columns)
+        for game in cls.latest(5):
+            when = game.run_date
+            winners = [result.llm for result in game.results if result.rank == 0]
+            winners_str = ", ".join(winners)
+            df.loc[len(df)] = [when, winners_str]
         return df

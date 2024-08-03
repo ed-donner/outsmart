@@ -6,7 +6,7 @@ The class method LLM.for_model_name will create an instance of a subclass to int
 
 import os
 from abc import ABC
-from typing import Any, Dict, Self
+from typing import Any, Dict, Self, List
 from openai import OpenAI
 import google.generativeai
 import anthropic
@@ -64,7 +64,7 @@ class LLM(ABC):
         return mapping
 
     @classmethod
-    def for_model_name(cls, model_name: str, temperature=1.0) -> Self:
+    def for_model_name(cls, model_name: str, temperature=0.7) -> Self:
         """
         Given a particular model name, instantiate one of the subclasses of the receiver and initialize it
         :param model_name: The name of the model to be communicated with
@@ -76,6 +76,13 @@ class LLM(ABC):
         llm = llm_class(model_name, temperature)
         return llm
 
+    @classmethod
+    def all_model_names(cls) -> List[str]:
+        """
+        :return: a list of names of all the models supported
+        """
+        return list(cls.model_map().keys())
+
 
 class GPT(LLM):
 
@@ -83,8 +90,6 @@ class GPT(LLM):
         "gpt-3.5-turbo",
         "gpt-4-turbo",
         "gpt-4o",
-        "gpt-3.5-turbo-0125",
-        "gpt-3.5-turbo-1106",
         "gpt-4o-mini",
     ]
 
@@ -115,7 +120,7 @@ class Claude(LLM):
 
     model_names = [
         "claude-3-5-sonnet-20240620",
-        "claude-3-sonnet-20240229",
+        # "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307",
     ]
 
@@ -145,7 +150,8 @@ class Claude(LLM):
 class Gemini(LLM):
 
     model_names = [
-        "gemini-pro",
+        "gemini-1.0-pro",
+        "gemini-1.5-flash",
     ]
 
     def setup_client(self):
@@ -177,7 +183,7 @@ class Gemini(LLM):
 class Llama(LLM):
 
     API_URL = "https://api-inference.huggingface.co/models/meta-llama/"
-    model_names = ["Meta-Llama-3-8B"]
+    model_names = []  # ["Meta-Llama-3-8B"]
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """

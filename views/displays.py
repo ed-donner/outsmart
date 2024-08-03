@@ -3,6 +3,8 @@ from game.arenas import Arena
 import streamlit as st
 from views.headers import display_headers
 from views.sidebars import display_sidebar
+from streamlit_extras.buy_me_a_coffee import button as coffee
+import streamlit.components.v1 as components
 
 
 class Display:
@@ -75,6 +77,8 @@ class Display:
                 inner = st.empty()
                 with inner.container():
                     self.display_player(player)
+
+        # coffee(username="ed.donner", floating=True, width=221)
 
         if st.session_state.auto_move:
             self.do_auto_turn()

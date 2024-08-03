@@ -2,14 +2,13 @@
 Entry point for the Outsmart Arena LLM Battle
 """
 
-import os
-
 from dotenv import load_dotenv
 import logging
 from game.arenas import Arena
 import streamlit as st
 from util.setup import setup_logger, STYLE
 from views.displays import Display
+from models.games import Game
 
 root = logging.getLogger()
 if "root" not in st.session_state:
@@ -32,6 +31,7 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 if "arena" not in st.session_state:
     st.session_state.arena = Arena.default()
+    # Game.reset()
 
 if "auto_move" not in st.session_state:
     st.session_state.auto_move = False

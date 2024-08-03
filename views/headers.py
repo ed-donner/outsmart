@@ -7,7 +7,9 @@ def display_overview(arena, do_turn, do_auto_turn):
     st.markdown("<h1 style='text-align: center;'>Outsmart</h1>", unsafe_allow_html=True)
     st.markdown(
         """<p style='text-align: center;'>A battle of diplomacy and deviousness between LLMs<br/>
-        <span style='text-align: center; font-size:13px;'>Read the <a href='https://edwarddonner.com'>backstory</a> or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span></p>""",
+        <span style='text-align: center; font-size:13px;'>Read the <a href='https://edwarddonner.com'>backstory</a> or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span><br/>
+        <span style='text-align: center; font-size:13px;'>Open the sidebar for results and rankings</span>
+        </p>""",
         unsafe_allow_html=True,
     )
     button_columns = st.columns([0.2, 1, 0.2, 1, 0.2])

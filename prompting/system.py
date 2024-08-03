@@ -59,7 +59,10 @@ You will then make your move by responding strictly using JSON. You should follo
     }
 }
 
-You must only respond in JSON, it must always give 1 coin and take 1 coin, and contain a private message to each of the other players.
-Your goal is to end up with the most coins through strategy and negotiation."""
+You must only respond in JSON. The JSON must always give 1 coin and take 1 coin, and contain a private message to each of the other players.
+Your goal is to end up with the most coins through negotiation.
+To achieve this goal, consider how reliable and trustworthy the other players are, and whether they trust you. Strive to form alliances.
+Aim to win, or at least rank as high as possible.
+"""
 
     return response

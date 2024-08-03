@@ -38,36 +38,18 @@ You must respond strictly in JSON, and it must follow this format:
 }
 
 """
-    #     response += (
-    #         """Here is another example of correctly formatted JSON:
-    # {
-    #     "secret strategy": "Your secret plans go here",
-    #     "give coin to": "must be one of """
-    #         + others
-    #         + """",
-    #     "take coin from": "must be one of """
-    #         + others
-    #         + """",
-    #     "private messages":
-    #     {
-    # """
-    #     )
-    #     lines = [
-    #         f'      "{other}": "Your private message for {other}"' for other in other_names
-    #     ]
-    #     response += ",\n".join(lines)
-    #     response += """
-    #     }
-    # }
-    #
-    # """
     response += """You must only respond in JSON.
 Your goal is to make most coins through strategy and negotiation."""
     return response
 
 
 def for_turn(
-    name: str, other_names: List[str], coins: int, turn: int, records: List[TurnRecord]
+    name: str,
+    other_names: List[str],
+    other_coins: List[int],
+    coins: int,
+    turn: int,
+    records: List[TurnRecord],
 ) -> str:
     """
     :return: a prompt that can be used for a first round user prompt
@@ -84,7 +66,10 @@ This is turn {turn} of the game. Here is a summary of you moves and the outcomes
     response += f"""
 That brings us to the current turn, {turn}.
 As a result of the previous turns, you now have {coins} coins.
-Please make your next move, by deciding which player to give a coin to, which player to take a coin from, and private messages for each player.
+Here are the coins now held by the others. Your goal is to rank as high as possible compared to them.\n"""
+    for other_name, other_coin in zip(other_names, other_coins):
+        response += f"- {other_name} has {other_coin} coins\n"
+    response += """Please make your next move, by deciding which player to give a coin to, which player to take a coin from, and private messages for each player.
 You must respond strictly in JSON, and it must follow this format:
 
 """
@@ -111,37 +96,18 @@ You must respond strictly in JSON, and it must follow this format:
 }
 
 """
-    #     response += (
-    #         """Here is another example of correctly formatted JSON:
-    # {
-    #     "secret strategy": "Your secret plans go here",
-    #     "give coin to": "must be one of """
-    #         + others
-    #         + """",
-    #     "take coin from": "must be one of """
-    #         + others
-    #         + """",
-    #     "private messages":
-    #     {
-    # """
-    #     )
-    #     lines = [
-    #         f'      "{other}": "Your private message for {other}"' for other in other_names
-    #     ]
-    #     response += ",\n".join(lines)
-    #     response += """
-    #     }
-    # }
-    #
-    # """
-    # response += "You must only respond in JSON. Your goal is to make the most coins through strategy and negotiation."
     return response
 
 
 def prompt(
-    name: str, other_names: List[str], coins: int, turn: int, records: List[TurnRecord]
+    name: str,
+    other_names: List[str],
+    other_coins: List[int],
+    coins: int,
+    turn: int,
+    records: List[TurnRecord],
 ) -> str:
     if turn == 1:
         return first_turn(name, other_names, coins)
     else:
-        return for_turn(name, other_names, coins, turn, records)
+        return for_turn(name, other_names, other_coins, coins, turn, records)
