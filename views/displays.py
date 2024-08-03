@@ -3,6 +3,7 @@ from game.arenas import Arena
 import streamlit as st
 from views.headers import display_headers
 from views.sidebars import display_sidebar
+from streamlit.components.v1 import html
 
 
 class Display:
@@ -75,6 +76,21 @@ class Display:
                 inner = st.empty()
                 with inner.container():
                     self.display_player(player)
+
+        html(
+            """
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-V8RWM7Y7E5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-V8RWM7Y7E5');
+</script>
+        """,
+            width=0,
+            height=0,
+        )
 
         if st.session_state.auto_move:
             self.do_auto_turn()

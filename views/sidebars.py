@@ -7,7 +7,7 @@ from models.games import Game
 def display_ranks():
     st.write("Rank table")
     st.write(
-        "The skill level of each LLM using the TrueSkill methodology,"
+        "The skill ratings use the TrueSkill methodology,"
         " ELO-style ratings for multi-player games."
     )
     column_config = {
@@ -28,8 +28,9 @@ def display_latest():
 
 
 def display_coffee():
-    st.write(
-        "If you enjoyed this app, I'm super grateful for any recognition, but not required at all!"
+    st.markdown(
+        "<span style='font-size:13px;'>If you enjoyed Outsmart, I'm super grateful for any recognition, but not required at all!</span>",
+        unsafe_allow_html=True,
     )
     st.markdown(
         """
