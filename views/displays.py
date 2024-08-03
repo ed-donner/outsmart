@@ -79,13 +79,14 @@ class Display:
 
         html(
             """
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-V8RWM7Y7E5"></script>
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2RCHZWEWVR"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-V8RWM7Y7E5');
+  gtag('config', 'G-2RCHZWEWVR');
 </script>
         """,
             width=0,
