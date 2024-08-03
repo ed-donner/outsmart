@@ -22,7 +22,7 @@ class Result(BaseModel):
     def update_on(self, df: pd.DataFrame):
         llm = self.llm
         if not (df["LLM"] == llm).any():
-            df.loc[len(df)] = [llm, 0, 0, 0]
+            df.loc[len(df)] = [llm, 0, 0.0, 0.0]
         games = df.loc[df["LLM"] == llm, "Games"].values[0]
         wins_percent = df.loc[df["LLM"] == llm, "Win %"].values[0]
         wins = games * wins_percent / 100

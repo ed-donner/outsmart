@@ -1,6 +1,7 @@
 import streamlit as st
 import base64
 from io import BytesIO
+from game.arenas import Arena
 
 
 def display_overview(arena, do_turn, do_auto_turn):
@@ -12,21 +13,30 @@ def display_overview(arena, do_turn, do_auto_turn):
         </p>""",
         unsafe_allow_html=True,
     )
-    button_columns = st.columns([0.2, 1, 0.2, 1, 0.2])
-    with button_columns[1]:
+
+    button_columns = st.columns([1, 0.1, 1, 0.1, 1])
+    with button_columns[0]:
         st.button(
             f"Run Turn {arena.turn}",
             disabled=arena.is_game_over,
             on_click=do_turn,
             use_container_width=True,
         )
-    with button_columns[3]:
+    with button_columns[2]:
         st.button(
             "Run Game",
             disabled=arena.is_game_over,
             use_container_width=True,
             on_click=do_auto_turn,
         )
+    with button_columns[4]:
+        if st.button(
+            "Restart Game",
+            use_container_width=True,
+        ):
+            arena = Arena.default()
+            st.session_state.arena = arena
+            st.rerun()
 
 
 def display_image():
