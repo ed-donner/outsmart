@@ -47,7 +47,7 @@ Using Anaconda is highly recommended, to provide you with a consistent environme
 
 1. If you don't have it already, install [Anaconda](https://docs.anaconda.com/anaconda/install/)
 2. Create and activate your environment with:  
-`conda create -m outsmart python=3.11`  
+`conda create -n outsmart python=3.11`  
 `conda activate outsmart`
 3. git clone the repo and install dependencies from the root directory:  
 `pip install -r requirements.txt`
