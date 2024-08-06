@@ -22,6 +22,8 @@ class Player:
     is_winner: bool
     series: List[int]
 
+    MAX_TOKENS = 600
+
     def __init__(self, name: str, model_name: str, temperature: float):
         """
         Create a new instance of Player
@@ -67,11 +69,11 @@ class Player:
         """
         Carry out a turn by interfacing with my LLM
         :param turn: which turn number we are on
-        :return: a string response
+        :return: the response from the LLM
         """
         system_prompt = self.system_prompt()
         user_prompt = self.user_prompt(turn)
-        return self.llm.send(system_prompt, user_prompt, 600)
+        return self.llm.send(system_prompt, user_prompt, self.MAX_TOKENS)
 
     def report(self) -> str:
         """

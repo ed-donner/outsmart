@@ -23,6 +23,9 @@ class Arena:
     turn: int
     is_game_over: bool
 
+    NAMES = ["Alex", "Blake", "Charlie", "Drew", "Eden", "Fallon", "Gale", "Harper"]
+    TEMPERATURE = 0.7
+
     def __init__(self, players: List[Player]):
         """
         Create a new instance of the Arena, the manager of the game
@@ -129,6 +132,7 @@ class Arena:
         Determine the list of model names to use in a new Arena
         If there's an environment variable ARENA=random then pick 4 random model names
         otherwise use 4 cheap models
+        The arena should support 3 or more names, although only 4 has been tested
         :return: a list of names of LLMs for a new Arena
         """
         arena_type = os.getenv("ARENA")
@@ -148,12 +152,12 @@ class Arena:
         Return a new instance of Arena with default players
         :return: an Arena instance
         """
-        names = ["Alex", "Blake", "Charlie", "Drew"]
+        names = cls.NAMES
         model_names = cls.model_names()
-        temperatures = [0.7, 0.7, 0.7, 0.7]
-        players = []
-        for data in zip(names, model_names, temperatures):
-            players.append(Player(data[0], data[1], data[2]))
+        players = [
+            Player(name, model_name, cls.TEMPERATURE)
+            for name, model_name in zip(names, model_names)
+        ]
         return cls(players)
 
     def turn_name(self) -> str:
