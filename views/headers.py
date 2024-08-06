@@ -15,9 +15,8 @@ def display_overview(arena: Arena, do_turn: Callable, do_auto_turn: Callable) ->
     st.markdown("<h1 style='text-align: center;'>Outsmart</h1>", unsafe_allow_html=True)
     st.markdown(
         """<p style='text-align: center;'>A battle of diplomacy and deviousness between LLMs<br/>
-        <span style='text-align: center; font-size:13px;'>
         Read the <a href='https://edwarddonner.com/2024/08/06/outsmart/'>backstory</a>
-        or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span><br/>
+        or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models<br/>
         <span style='text-align: center; font-size:13px;'>Open the sidebar for the leaderboard</span>
         </p>""",
         unsafe_allow_html=True,

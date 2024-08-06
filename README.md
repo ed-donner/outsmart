@@ -21,7 +21,7 @@ thumbnail: https://edwarddonner.com/wp-content/uploads/2024/08/outsmart.jpg
 Outsmart is an LLM Arena that pits AI models against each other
 in a game of strategy and negotiation.
 
-[Play the game](https://huggingface.co/spaces/ed-donner/outsmart) on Hugging Face spaces  
+[Play the game](https://ed-donner-outsmart.hf.space) on Hugging Face spaces  
 [Read the backstory](https://edwarddonner.com/2024/08/06/outsmart/) on my website  
 [Clone the repo](https://github.com/ed-donner/outsmart) to use your API keys and fight with frontier models!
 
