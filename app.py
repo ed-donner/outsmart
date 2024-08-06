@@ -1,5 +1,11 @@
 """
 Entry point for the Outsmart Arena LLM Battle
+Initialize logging, env variables and styling as needed
+Check if an Arena is in the session, and if not, create a new one using Arena.default()
+Delegate to a Display object to manage the drawing of the UI components
+
+To see it in action, run:
+python -m streamlit run app.py
 """
 
 from dotenv import load_dotenv
@@ -8,7 +14,6 @@ from game.arenas import Arena
 import streamlit as st
 from util.setup import setup_logger, STYLE
 from views.displays import Display
-from models.games import Game
 
 root = logging.getLogger()
 if "root" not in st.session_state:
@@ -21,17 +26,15 @@ st.set_page_config(
     layout="wide",
     page_title="Outsmart",
     menu_items={
-        "About": "Outsmart is an LLM arena in which 4 LLMs compete by negotiating with each other. Read more at https://edwarddonner.com"
+        "About": "Outsmart is an LLM arena that pits LLMs against each other in a battle of negotiation. More at https://edwarddonner.com/2024/08/06/outsmart/"
     },
     page_icon="🧠",
     initial_sidebar_state="collapsed",
 )
 st.markdown(STYLE, unsafe_allow_html=True)
 
-
 if "arena" not in st.session_state:
     st.session_state.arena = Arena.default()
-    # Game.reset()
 
 if "auto_move" not in st.session_state:
     st.session_state.auto_move = False

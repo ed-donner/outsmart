@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Callable
 import json
 import logging
 from game.players import Player
@@ -7,6 +7,8 @@ from models.records import TurnRecord
 from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
+
+ProgressCallback = Callable[[float, str], None]
 
 
 class Referee:
@@ -31,7 +33,12 @@ class Referee:
         self.player_map = {player.name: player for player in players}
         self.alliances = []
 
-    def do_turn_for_player(self, player) -> TurnRecord:
+    def do_turn_for_player(self, player: Player) -> TurnRecord:
+        """
+        Carry out a turn for this player whilst handling any exceptions raised
+        :param player: the player being processed
+        :return: a TurnRecord that wraps the output from the model, including whether it was valid
+        """
         response = ""
         try:
             response = player.make_move(self.turn)
@@ -45,43 +52,48 @@ class Referee:
             return TurnRecord(player.name, self.turn, is_invalid_move=True)
 
     def player_with_name(self, name: str) -> Player:
-        for player in self.players:
-            if player.name == name:
-                return player
-        raise ValueError(f"Failed to find player with name {name}")
-
-    def do_turn(self, progress):
         """
-        This is the entry point, called by an Arena object to run a Turn
-        First get each Player to make a move using concurrent.futures to run in parallel
+        Return the player with the given name
+        :param name: the name of a player
+        :return: the player object
+        """
+        player = self.player_map[name]
+        if player:
+            return player
+        else:
+            raise ValueError(f"Failed to find player with name {name}")
+
+    def do_turn(self, progress: ProgressCallback) -> None:
+        """
+        This is called by an Arena object to run a Turn
+        First get each Player to make a move using ThreadPoolExecutor to run in parallel
         Then evaluate each Player in turn
-        :param progress: an object on which to report progress that will be reflected in the UI
+        :param progress: a callback on which to report progress that will be reflected in the UI
         :return:
         """
-        progress.progress(0, "Players are thinking..")
+        progress(0, "Players are thinking..")
         responded = []
-        with ThreadPoolExecutor(max_workers=4) as e:
+        with ThreadPoolExecutor(max_workers=len(self.players)) as e:
             for record in e.map(self.do_turn_for_player, self.players):
                 player = self.player_with_name(record.name)
                 responded.append(record.name)
                 prog = len(responded) / len(self.players)
-                progress.progress(prog, f"{', '.join(responded)} responded..")
+                progress(prog, f"{', '.join(responded)} responded..")
                 self.records[record.name] = record
                 player.records.append(record)
-        progress.progress(1.0, text="Finishing up..")
+        progress(1.0, "Finishing up..")
         self.handle_turn()
 
-    def handle_turn(self):
+    def handle_turn(self) -> None:
         """
         The turn has happened; now go through each player and make the trades
-        :return:
         """
         self.handle_giving()
         self.handle_taking()
         self.handle_alliances()
         self.handle_messages()
 
-    def handle_giving(self):
+    def handle_giving(self) -> None:
         """
         Go through the players and give a coin for each of the people they gave to
         """
@@ -93,7 +105,7 @@ class Referee:
                 self.records[who].givers.append(player.name)
             player.coins -= 1
 
-    def handle_taking(self):
+    def handle_taking(self) -> None:
         """
         Go through the players and take away a coin from people they've taken
         """
@@ -105,7 +117,7 @@ class Referee:
                 self.records[who].takers.append(player.name)
                 player.coins += 1
 
-    def handle_alliances(self):
+    def handle_alliances(self) -> None:
         """
         Identify the special situation of an alliance, where 2 players have picked each other
         and have taken from the same player
@@ -126,7 +138,7 @@ class Referee:
 
     def investigate_alliance(
         self, name1: str, record1: TurnRecord, name2: str, record2: TurnRecord
-    ):
+    ) -> None:
         """
         We know that these 2 players have gifted each other.
         See if they took from the same player
@@ -138,7 +150,7 @@ class Referee:
             self.alliances.append(name2)
             self.process_alliance(name1, name2, take1)
 
-    def process_alliance(self, name1: str, name2: str, victim: str):
+    def process_alliance(self, name1: str, name2: str, victim: str) -> None:
         """
         We have an alliance - now take action
         """
@@ -149,10 +161,9 @@ class Referee:
         self.records[name2].alliances_with.append(name1)
         self.records[victim].alliances_against.extend([name1, name2])
 
-    def handle_messages(self):
+    def handle_messages(self) -> None:
         """
         Manage the messages that each player has sent - put it in the recipient's records
-        :return:
         """
         for player in self.players:
             name = player.name
@@ -162,7 +173,7 @@ class Referee:
                 for recipient, message in messages.items():
                     self.records[recipient].messages[player.name] = message
 
-    def check_response(self, move: Move):
+    def check_response(self, move: Move) -> None:
         """
         Make sure the give and take fields are valid, otherwise fail
         :param move: The move object representing the response from the player

@@ -5,6 +5,7 @@ from models.moves import Move
 class TurnRecord:
     """
     This tracks the key information associated with a turn for a particular player
+    It wraps the Move from the player and tracks if the move is valid
     """
 
     turn: int
@@ -36,6 +37,7 @@ class TurnRecord:
 
     def __repr__(self) -> str:
         """
+        Convert this TurnRecord into text; this is used to describe historic moves when making the prompt
         :return: a string to represent this instance
         """
         result = f"Recap of Turn {self.turn}\n\n"

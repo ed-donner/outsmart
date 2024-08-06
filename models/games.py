@@ -7,19 +7,33 @@ from pydantic import BaseModel
 import pandas as pd
 import trueskill
 from trueskill import Rating
+import json
 
 
 class Result(BaseModel):
+    """
+    An individual result of 1 LLM playing in a game, capturing how many coins it ended with
+    and its rank, where 0 means that it won
+    """
 
     name: str
     llm: str
     coins: int
     rank: int
 
-    def __repr__(self):
-        return str(self.model_dump())
+    def __repr__(self) -> str:
+        """
+        Convert this object to json
+        :return: a json string for each result
+        """
+        return json.dumps(self.model_dump())
 
-    def update_on(self, df: pd.DataFrame):
+    def update_on(self, df: pd.DataFrame) -> None:
+        """
+        Add this result to the DataFrame for the leaderboard
+        This is perhaps more complex than needed because the dataframe only has Win %, not a count of Wins
+        :param df: the dataframe for the leaderboard
+        """
         llm = self.llm
         if not (df["LLM"] == llm).any():
             df.loc[len(df)] = [llm, 0, 0.0, 0.0]
@@ -34,12 +48,18 @@ class Result(BaseModel):
 
 
 class Game(BaseModel):
+    """
+    The result of a Game, stored in the DB
+    """
 
     run_date: datetime
     results: List[Result]
 
     def __str__(self) -> str:
-        return str(self.model_dump())
+        """
+        :return: a string json version of this game
+        """
+        return json.dumps(self.model_dump())
 
     @staticmethod
     @st.cache_resource
@@ -82,6 +102,12 @@ class Game(BaseModel):
 
     @classmethod
     def ratings_for(cls, games: List[Self], df: pd.DataFrame) -> Dict[str, Rating]:
+        """
+        Create a Rating object for each LLM in the list of historic games
+        :param games: a list of historic games
+        :param df: a dataframe with the ranks of past games
+        :return: a dictionary that maps models to their Rating objects
+        """
         ratings = {row["LLM"]: Rating() for _, row in df.iterrows()}
         for game in games:
             llms = [result.llm for result in game.results]
@@ -94,6 +120,12 @@ class Game(BaseModel):
 
     @classmethod
     def games_df(cls) -> pd.DataFrame:
+        """
+        Create a dataframe that represents the leaderboard for games played
+        Use the TrueSkill methodology to assess Skill level
+        The expose method calculates 1 number (mean - 3 * standard deviation) for the leaderboard
+        :return: a DataFrame with the leaderboard including Win % and Skill
+        """
         columns = ["LLM", "Games", "Win %", "Skill"]
         df = pd.DataFrame(columns=columns)
         games = cls.all()
@@ -107,6 +139,10 @@ class Game(BaseModel):
 
     @classmethod
     def latest_df(cls) -> pd.DataFrame:
+        """
+        Create a table of the most recent 5 games
+        :return: A dataframe to represent the winners of the last 5 games
+        """
         columns = ["When", "Winner(s)"]
         df = pd.DataFrame(columns=columns)
         for game in cls.latest(5):

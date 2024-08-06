@@ -1,12 +1,13 @@
 """
 This module contains the interfaces to external LLMs;
 There's an abstract base class LLM that can be subclassed to provide an interface to a model.
-The class method LLM.for_model_name will create an instance of a subclass to interact with the API
+The class method LLM.for_model_name creates an instance of a subclass to interact with the API
+This module should have no knowledge of the game itself.
 """
 
 import os
 from abc import ABC
-from typing import Any, Dict, Self, List
+from typing import Any, Dict, Self, List, Type
 from openai import OpenAI
 import google.generativeai
 import anthropic
@@ -52,7 +53,7 @@ class LLM(ABC):
         return f"<LLM {self.model_name} with temnp={self.temperature}>"
 
     @classmethod
-    def model_map(cls) -> Dict[str, Any]:
+    def model_map(cls) -> Dict[str, Type[Self]]:
         """
         Generate a mapping of Model Names to LLM classes, by looking at all subclasses of this one
         :return: a mapping dictionary from model name to LLM subclass
@@ -98,7 +99,7 @@ class GPT(LLM):
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """
-        Implemented by subclasses
+        Implementation for OpenAI / GPT
         :param system_prompt: The system prompt passed to the LLM
         :param user_prompt: The user prompt passed to the LLM
         :param max_tokens: Maximum number of tokens
@@ -129,7 +130,7 @@ class Claude(LLM):
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """
-        Implemented by subclasses
+        Implementation for Anthropic / Claude
         :param system_prompt: The system prompt passed to the LLM
         :param user_prompt: The user prompt passed to the LLM
         :param max_tokens: Maximum number of tokens
@@ -160,7 +161,7 @@ class Gemini(LLM):
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """
-        Implemented by subclasses
+        Implementation for Google / Gemini
         :param system_prompt: The system prompt passed to the LLM
         :param user_prompt: The user prompt passed to the LLM
         :param max_tokens: Maximum number of tokens
@@ -187,7 +188,7 @@ class Llama(LLM):
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """
-        Implemented by subclasses
+        Implementation for Meta Llama - not tested yet, example code
         :param system_prompt: The system prompt passed to the LLM
         :param user_prompt: The user prompt passed to the LLM
         :param max_tokens: Maximum number of tokens
@@ -202,7 +203,7 @@ class Llama(LLM):
 
         api_url = self.API_URL + self.model_name
         headers = {"Authorization": f"Bearer {os.environ['HF_TOKEN']}"}
-        inputs = {"inputs": "message"}
+        inputs = {"inputs": message}
         response = requests.post(api_url, headers=headers, json=inputs)
         result = response.json()
         return result

@@ -11,7 +11,8 @@ pinned: false
 license: mit
 fullWidth: true
 header: mini
-
+tags: ["arena", "benchmark", "leaderboard"]
+thumbnail: https://edwarddonner.com/wp-content/uploads/2024/08/outsmart.jpg
 ---
 
 # Outsmart

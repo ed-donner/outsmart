@@ -5,10 +5,11 @@ from models.games import Game
 
 
 def display_ranks():
-    st.write("Rank table")
-    st.write(
+    st.markdown(
+        "<span style='font-size:13px;'>The table is sorted initially by Win %. "
         "The skill ratings use the TrueSkill methodology,"
-        " ELO-style ratings for multi-player games."
+        " an ELO-style system for multi-player games.</span>",
+        unsafe_allow_html=True,
     )
     column_config = {
         "LLM": st.column_config.TextColumn(width="small"),
@@ -46,7 +47,7 @@ def display_coffee():
 
 def display_sidebar():
     with st.sidebar:
-        st.markdown("### LLM Rankings")
+        st.markdown("### Outsmart Leaderboard")
         if os.getenv("MONGO_URI"):
             try:
                 st.write(f"There have been {Game.count():,} games recorded.")

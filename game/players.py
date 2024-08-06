@@ -7,7 +7,9 @@ from models.records import TurnRecord
 
 class Player:
     """
-    An LLM participating in the Arena
+    A particular Player in the game of Outsmart
+    The player has a name, and an underlying llm (an instance of a subclass of interface.llms.LLM)
+    All LLM interactions are delegated to the LLM object.
     """
 
     name: str
@@ -46,14 +48,14 @@ class Player:
 
     def system_prompt(self) -> str:
         """
-        :return: a System Prompt to reflect this player
+        :return: a System Prompt to be sent to the LLM
         """
         other_names = [other.name for other in self.others]
         return instructions(self.name, other_names)
 
     def user_prompt(self, turn: int) -> str:
         """
-        :return: a User prompt to reflect this player in this turn
+        :return: a User prompt to instruct the LLM for this player for this turn
         """
         other_names = [other.name for other in self.others]
         other_coins = [other.coins for other in self.others]
@@ -69,7 +71,7 @@ class Player:
         """
         system_prompt = self.system_prompt()
         user_prompt = self.user_prompt(turn)
-        return self.llm.send(system_prompt, user_prompt, 400)
+        return self.llm.send(system_prompt, user_prompt, 600)
 
     def report(self) -> str:
         """
@@ -84,5 +86,8 @@ class Player:
             result += "<br/>"
         return result
 
-    def kill(self):
+    def kill(self) -> None:
+        """
+        This player has died - update the status
+        """
         self.is_dead = True

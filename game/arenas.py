@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List, Self
+from typing import List, Self, Callable
 from game.players import Player
 from game.referees import Referee
 import random
@@ -11,10 +11,12 @@ from models.games import Result, Game
 from datetime import datetime
 from interfaces.llms import LLM
 
+ProgressCallback = Callable[[float, str], None]
+
 
 class Arena:
     """
-    The manager of multiple Players competing in Outsmart
+    The central Game Manager for the Outsmart LLM arena, managing a list of players
     """
 
     players: List[Player]
@@ -81,22 +83,26 @@ class Arena:
         """
         After a turn has completed, see if any player has run out of money. If so, end the game.
         """
+        game_ended = False
         for player in self.players:
             if player.coins <= 0:
                 player.coins = 0
                 player.kill()
-                self.handle_game_over()
+                game_ended = True
+        if game_ended:
+            self.handle_game_over()
 
-    def do_turn(self, progress) -> bool:
+    def prepare_for_turn(self) -> None:
         """
-        Carry out a Turn; delegate to a Referee to manage this process
-        :param progress: an object on which to report progress that will be reflected in the UI
-        :return True if the game ended
+        Before carrying out a turn, store the coins each player had initially
         """
         for player in self.players:
             player.prior_coins = player.coins
-        ref = Referee(self.players, self.turn)
-        ref.do_turn(progress)
+
+    def process_turn_outcome(self) -> None:
+        """
+        A turn has completed. Handle the outcome, including checking if the game has ended
+        """
         for player in self.players:
             player.series.append(player.coins)
         self.post_turn_solvency_check()
@@ -104,10 +110,27 @@ class Arena:
             self.handle_game_over()
         elif not self.is_game_over:
             self.turn += 1
+
+    def do_turn(self, progress: ProgressCallback) -> bool:
+        """
+        Carry out a Turn by delegating to a Referee object
+        :param progress: a callback on which to report progress
+        :return True if the game ended
+        """
+        self.prepare_for_turn()
+        ref = Referee(self.players, self.turn)
+        ref.do_turn(progress)
+        self.process_turn_outcome()
         return self.is_game_over
 
     @classmethod
     def model_names(cls) -> List[str]:
+        """
+        Determine the list of model names to use in a new Arena
+        If there's an environment variable ARENA=random then pick 4 random model names
+        otherwise use 4 cheap models
+        :return: a list of names of LLMs for a new Arena
+        """
         arena_type = os.getenv("ARENA")
         if arena_type == "random":
             return random.sample(LLM.all_model_names(), 4)
@@ -137,6 +160,12 @@ class Arena:
         return f"Turn {self.turn}"
 
     def table(self) -> pd.DataFrame:
+        """
+        Create the table of coins by turn that will be used to make a line chart of each player
+        Use NaN to fill up each row to 10 datapoints so that the axes display properly;
+        The NaN values don't show on the line chart
+        :return: a dataframe that shows how each players' coins have evolved during the game
+        """
         d = {}
         padding = [math.nan] * (11 - self.turn)
         for player in self.players:
@@ -146,10 +175,18 @@ class Arena:
 
     @staticmethod
     def rankings() -> pd.DataFrame:
+        """
+        Create the leaderboard, delegating to the Game business object to handle this
+        :return: a dataframe with the leaderboard info
+        """
         df = Game.games_df()
-        df = df.sort_values(by="Skill", ascending=False)
+        df = df.sort_values(by="Win %", ascending=False)
         return df
 
     @staticmethod
     def latest() -> pd.DataFrame:
+        """
+        Create the table of last N games, delegating to the Game business object
+        :return: a dataframe with the most recent results of games
+        """
         return Game.latest_df()

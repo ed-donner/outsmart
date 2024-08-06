@@ -4,6 +4,9 @@ from models.records import TurnRecord
 
 def first_turn(name: str, other_names: List[str], coins: int) -> str:
     """
+    :param name: the name of the player
+    :param other_names: the name of the competitors
+    :param coins: how many coins the player has
     :return: a prompt that can be used for a first round user prompt
     """
     others = ", ".join(other_names)
@@ -52,7 +55,13 @@ def for_turn(
     records: List[TurnRecord],
 ) -> str:
     """
-    :return: a prompt that can be used for a first round user prompt
+    :param name: the name of this player
+    :param other_names: the names of its competitors
+    :param other_coins: the coins of the competitors
+    :param coins: this player's coins
+    :param turn: the turn number
+    :param records: the records of prior turns, to explain how we got here
+    :return: a user prompt to get the LLM to make this move
     """
     others = ", ".join(other_names)
     response = f"""Your player name is {name} and the other players are {others}.
@@ -107,6 +116,16 @@ def prompt(
     turn: int,
     records: List[TurnRecord],
 ) -> str:
+    """
+    Decide how to prompt the LLM for this turn; use a different approach for Turn 1 and for subsequent Turns
+    :param name: the name of this player
+    :param other_names: the names of its competitors
+    :param other_coins: the coins of the competitors
+    :param coins: this player's coins
+    :param turn: the turn number
+    :param records: the records of prior turns, to explain how we got here
+    :return: a user prompt to get the LLM to make this move
+    """
     if turn == 1:
         return first_turn(name, other_names, coins)
     else:

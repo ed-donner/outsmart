@@ -2,14 +2,23 @@ import streamlit as st
 import base64
 from io import BytesIO
 from game.arenas import Arena
+from typing import Callable
 
 
-def display_overview(arena, do_turn, do_auto_turn):
+def display_overview(arena: Arena, do_turn: Callable, do_auto_turn: Callable) -> None:
+    """
+    Show the top middle sections of the header, including the buttons andlinks
+    :param arena: the arena being run
+    :param do_turn: callback to run a turn
+    :param do_auto_turn: callback to run the game
+    """
     st.markdown("<h1 style='text-align: center;'>Outsmart</h1>", unsafe_allow_html=True)
     st.markdown(
         """<p style='text-align: center;'>A battle of diplomacy and deviousness between LLMs<br/>
-        <span style='text-align: center; font-size:13px;'>Read the <a href='https://edwarddonner.com'>backstory</a> or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span><br/>
-        <span style='text-align: center; font-size:13px;'>Open the sidebar for results and rankings</span>
+        <span style='text-align: center; font-size:13px;'>
+        Read the <a href='https://edwarddonner.com/2024/08/06/outsmart/'>backstory</a>
+        or clone the <a href='https://github.com/ed-donner/outsmart'>repo</a> to battle frontier models</span><br/>
+        <span style='text-align: center; font-size:13px;'>Open the sidebar for the leaderboard</span>
         </p>""",
         unsafe_allow_html=True,
     )
@@ -26,27 +35,34 @@ def display_overview(arena, do_turn, do_auto_turn):
         st.button(
             "Run Game",
             disabled=arena.is_game_over,
-            use_container_width=True,
             on_click=do_auto_turn,
+            use_container_width=True,
         )
     with button_columns[4]:
         if st.button(
             "Restart Game",
             use_container_width=True,
         ):
-            arena = Arena.default()
-            st.session_state.arena = arena
+            del st.session_state.arena
             st.rerun()
 
 
-def display_image():
+def display_image() -> None:
+    """
+    Show the image of the game. This needed to be base64 encoded due to Hugging Face not allowing
+    binary files in repos
+    """
     with open("outsmart_image_base64.txt", "r") as f:
         base64_string = f.read()
     image_data = base64.b64decode(base64_string)
     st.image(BytesIO(image_data), use_column_width="auto")
 
 
-def display_details(header_container):
+def display_details(header_container: st.container) -> None:
+    """
+    Show the game rules at the start of the game
+    :param header_container: where to put the rules; needed so we can replace it with a chart
+    """
     with header_container:
         st.write("  \n")
         st.write(
@@ -57,7 +73,12 @@ def display_details(header_container):
         )
 
 
-def display_chart(arena, header_container):
+def display_chart(arena: Arena, header_container: st.container):
+    """
+    Show the line chart of coin progress
+    :param arena: the underlying arena
+    :param header_container: where to put the chart; needed so it replaces the instructions
+    """
     with header_container:
         st.line_chart(
             data=arena.table(),
@@ -66,7 +87,13 @@ def display_chart(arena, header_container):
         )
 
 
-def display_headers(arena, do_turn, do_auto_turn):
+def display_headers(arena: Arena, do_turn: Callable, do_auto_turn: Callable) -> None:
+    """
+    Display the top 3 sections of the page
+    :param arena: the underlying arena
+    :param do_turn: a callboack to run the next turn
+    :param do_auto_turn: a callback to trigger running of the entire game
+    """
     header_columns = st.columns([1.5, 0.5, 2, 0.2, 1.8])
     with header_columns[0]:
         display_image()

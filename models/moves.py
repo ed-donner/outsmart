@@ -3,6 +3,9 @@ from typing import Dict
 
 
 class Move(BaseModel):
+    """
+    A pydantic class for the response coming back from an LLM
+    """
 
     strategy: str = Field(alias="secret strategy")
     give: str = Field(alias="give coin to")

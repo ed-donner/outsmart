@@ -2,7 +2,10 @@ import logging
 import sys
 
 
-def setup_logger(root):
+def setup_logger(root) -> None:
+    """
+    Set up consistent logging
+    """
     root.setLevel(logging.INFO)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.INFO)
