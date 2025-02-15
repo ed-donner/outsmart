@@ -140,10 +140,10 @@ class Arena:
             return random.sample(LLM.all_model_names(), 4)
         else:
             return [
-                "gpt-3.5-turbo",
-                "claude-3-haiku-20240307",
-                "gemini-1.0-pro",
-                "gpt-4o-mini",
+                "gpt-4o",
+                "claude-3-5-sonnet-latest",
+                "gemini-2.0-flash",
+                "deepseek-r1-distill-llama-70b",
             ]
 
     @classmethod

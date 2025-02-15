@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import pymongo
-from typing import List, Self, Dict, Any
+from typing import List, Self, Dict, Self
 from datetime import datetime
 from pydantic import BaseModel
 import pandas as pd
@@ -20,6 +20,15 @@ class Result(BaseModel):
     llm: str
     coins: int
     rank: int
+
+    def __init__(self, **args):
+        """
+        If necessary, fix this up so that different minor model variants have the same name
+        :return: self
+        """
+        super().__init__(**args)
+        if self.llm.startswith("claude-3-5-sonnet"):
+            self.llm = "claude-3.5-sonnet"
 
     def __repr__(self) -> str:
         """

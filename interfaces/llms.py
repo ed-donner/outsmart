@@ -11,7 +11,7 @@ from typing import Any, Dict, Self, List, Type
 from openai import OpenAI
 import google.generativeai
 import anthropic
-import requests
+from groq import Groq
 
 
 class LLM(ABC):
@@ -120,7 +120,7 @@ class GPT(LLM):
 class Claude(LLM):
 
     model_names = [
-        "claude-3-5-sonnet-20240620",
+        "claude-3-5-sonnet-latest",
         # "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307",
     ]
@@ -150,10 +150,7 @@ class Claude(LLM):
 
 class Gemini(LLM):
 
-    model_names = [
-        "gemini-1.0-pro",
-        "gemini-1.5-flash",
-    ]
+    model_names = ["gemini-1.0-pro", "gemini-1.5-flash", "gemini-2.0-flash"]
 
     def setup_client(self):
         google.generativeai.configure()
@@ -181,29 +178,35 @@ class Gemini(LLM):
         raise ValueError("Could not parse response from Gemini")
 
 
-class Llama(LLM):
+class GroqAPI(LLM):
+    """
+    A class to act as an interface to the remote AI, in this case Groq
+    """
 
-    API_URL = "https://api-inference.huggingface.co/models/meta-llama/"
-    model_names = []  # ["Meta-Llama-3-8B"]
+    model_names = [
+        "deepseek-r1-distill-llama-70b",
+        "llama-3.3-70b-versatile",
+        "mixtral-8x7b-32768",
+    ]
+
+    def setup_client(self):
+        self.client = Groq()
 
     def send(self, system_prompt: str, user_prompt: str, max_tokens: int) -> str:
         """
-        Implementation for Meta Llama - not tested yet, example code
+        Implementation for Groq
         :param system_prompt: The system prompt passed to the LLM
         :param user_prompt: The user prompt passed to the LLM
         :param max_tokens: Maximum number of tokens
         :return: the response from the LLM
         """
-
-        words = int(max_tokens * 0.75)
-        message = "First, here is a System Message to set context and instructions:\n\n"
-        message += system_prompt + "\n\n"
-        message += f"Now here is the User's Request - please respond in under {words} words:\n\n"
-        message += user_prompt + "\n"
-
-        api_url = self.API_URL + self.model_name
-        headers = {"Authorization": f"Bearer {os.environ['HF_TOKEN']}"}
-        inputs = {"inputs": message}
-        response = requests.post(api_url, headers=headers, json=inputs)
-        result = response.json()
-        return result
+        completion = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=1.0,
+            response_format={"type": "json_object"},
+        )
+        return completion.choices[0].message.content

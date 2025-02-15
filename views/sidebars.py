@@ -28,23 +28,6 @@ def display_latest():
     st.dataframe(data=Arena.latest(), hide_index=True, column_config=column_config)
 
 
-def display_coffee():
-    st.markdown(
-        "<span style='font-size:13px;'>If you enjoyed Outsmart, I'm super grateful for any recognition, but not required at all!</span>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        """
-        <div style="display: flex; justify-content: left;">
-            <a href="https://www.buymeacoffee.com/ed.donner" target="_blank">
-                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px; width: 150px;">
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def display_sidebar():
     with st.sidebar:
         st.markdown("### Outsmart Leaderboard")
@@ -63,4 +46,3 @@ def display_sidebar():
             st.write(
                 "LLM rankings aren't available as this app isn't connected to the database"
             )
-        display_coffee()

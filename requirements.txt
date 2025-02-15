@@ -1,9 +1,11 @@
 pydantic
 python-dotenv
+numpy
+scipy
 black
 openai
 anthropic
-google.generativeai
+google-generativeai
 streamlit
 pandas
 charset_normalizer
@@ -12,3 +14,4 @@ pymongo
 numpy
 scipy
 trueskill
+groq
