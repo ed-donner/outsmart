@@ -20,7 +20,7 @@ if "root" not in st.session_state:
     st.session_state.root = root
     setup_logger(root)
 
-load_dotenv()
+load_dotenv(override=True)
 
 st.set_page_config(
     layout="wide",

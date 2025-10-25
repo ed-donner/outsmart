@@ -50,9 +50,7 @@ class Arena:
             result += f"{player}\n"
         return result
 
-    def do_save_game(
-        self, names: List[str], llms: List[str], coins: List[int], ranks: List[int]
-    ):
+    def do_save_game(self, names: List[str], llms: List[str], coins: List[int], ranks: List[int]):
         results = []
         for name, llm, coin, rank in zip(names, llms, coins, ranks):
             r = Result(name=name, llm=llm, coins=coin, rank=rank)
@@ -140,10 +138,11 @@ class Arena:
             return random.sample(LLM.all_model_names(), 4)
         else:
             return [
-                "gpt-4o",
-                "claude-3-5-sonnet-latest",
-                "gemini-2.0-flash",
-                "deepseek-r1-distill-llama-70b",
+                "openai/gpt-oss-120b",
+                "gpt-5-nano",
+                # "gemini-2.5-pro",
+                "grok-4-fast",
+                "claude-haiku-4-5",
             ]
 
     @classmethod

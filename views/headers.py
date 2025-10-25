@@ -54,7 +54,7 @@ def display_image() -> None:
     with open("outsmart_image_base64.txt", "r") as f:
         base64_string = f.read()
     image_data = base64.b64decode(base64_string)
-    st.image(BytesIO(image_data), use_column_width="auto")
+    st.image(BytesIO(image_data))
 
 
 def display_details(header_container: st.container) -> None:
