@@ -184,6 +184,8 @@ class Arena:
         """
         df = Game.games_df()
         df = df.sort_values(by="Win %", ascending=False)
+        supported_models = LLM.all_model_names()
+        df = df[df["LLM"].isin(supported_models)]
         return df
 
     @staticmethod

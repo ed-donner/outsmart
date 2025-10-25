@@ -9,7 +9,6 @@ import os
 from abc import ABC
 from typing import Any, Dict, Self, List, Type
 from openai import OpenAI
-import google.generativeai
 import anthropic
 from groq import Groq
 
@@ -96,12 +95,6 @@ class LLM(ABC):
 
 class GPT(LLM):
     model_names = [
-        "gpt-3.5-turbo",
-        "gpt-4-turbo",
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-4.1",
-        "o4-mini",
         "gpt-5",
         "gpt-5-nano",
         "gpt-5-mini",
@@ -133,12 +126,6 @@ class GPT(LLM):
 
 class Claude(LLM):
     model_names = [
-        "claude-3-5-sonnet-latest",
-        # "claude-3-sonnet-20240229",
-        "claude-3-haiku-20240307",
-        "claude-4-sonnet-latest",
-        "claude-sonnet-4-0",
-        "claude-opus-4-1-20250805",
         "claude-sonnet-4-5",
         "claude-haiku-4-5",
     ]
@@ -196,7 +183,7 @@ class Claude(LLM):
 
 
 class Grok(LLM):
-    model_names = ["grok-3", "grok-4", "grok-4-fast"]
+    model_names = ["grok-4", "grok-4-fast"]
 
     def setup_client(self):
         self.client = OpenAI(api_key=os.getenv("GROK_API_KEY"), base_url=GROK_BASE_URL)
@@ -221,9 +208,6 @@ class Grok(LLM):
 
 class Gemini(LLM):
     model_names = [
-        "gemini-1.0-pro",
-        "gemini-1.5-flash",
-        "gemini-2.0-flash",
         "gemini-2.5-flash",
         "gemini-2.5-pro",
     ]
@@ -257,9 +241,6 @@ class GroqAPI(LLM):
     """
 
     model_names = [
-        "deepseek-r1-distill-llama-70b",
-        "llama-3.3-70b-versatile",
-        "mixtral-8x7b-32768",
         "openai/gpt-oss-120b",
     ]
 

@@ -7,6 +7,7 @@ from models.games import Game
 def display_ranks():
     st.markdown(
         "<span style='font-size:13px;'>The table is sorted initially by Win %. "
+        "This only shows recent versions of models. "
         "The skill ratings use the TrueSkill methodology,"
         " an ELO-style system for multi-player games.</span>",
         unsafe_allow_html=True,
@@ -38,11 +39,7 @@ def display_sidebar():
                     display_ranks()
                     display_latest()
             except Exception as e:
-                st.write(
-                    "Unable to calculate rankings - the database may not be available."
-                )
+                st.write("Unable to calculate rankings - the database may not be available.")
                 st.write(f"Underlying error was {e}")
         else:
-            st.write(
-                "LLM rankings aren't available as this app isn't connected to the database"
-            )
+            st.write("LLM rankings aren't available as this app isn't connected to the database")
